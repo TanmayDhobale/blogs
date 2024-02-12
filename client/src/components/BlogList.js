@@ -35,7 +35,7 @@ function BlogList() {
         textAlign: 'center', 
         fontWeight: 'bold', 
         color: '#2a2a2a' 
-      }}>All Blogs</h2>
+      }}>All Blog`s</h2>
       {blogs.map((blog) => (
         <div key={blog._id} style={{
           backgroundColor: '#ffffff',
