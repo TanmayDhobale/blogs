@@ -1,119 +1,152 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import styled from 'styled-components';
+import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
+import { debounce } from 'lodash';
 
-// Styled-components for enhanced CSS in JS
-const Container = styled.div`
-  font-family: 'Times New Roman', Times, serif;
-  color: #3a3a3a;
-  background-color: #f9f8f6;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-  margin: 20px auto;
-  width: 80%;
-  border: 1px solid #a8a8a8;
-  transition: all 0.3s ease-in-out;
+// Dark and light theme definitions
+const themes = {
+  dark: {
+    background: '#2D2D2D',
+    color: '#FFFFFF',
+    cardBackground: '#3C3C3C',
+    highlight: '#F4D03F',
+    toggleBorder: '#6B8096',
+  },
+  light: {
+    background: '#FFFFFF',
+    color: '#363537',
+    cardBackground: '#F0F0F0',
+    highlight: '#3498DB',
+    toggleBorder: '#FFF',
+  },
+};
 
-  &:hover {
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+// Global style for smooth theme transitions
+const GlobalStyles = createGlobalStyle`
+  body {
+    background-color: ${(props) => props.theme.background};
+    color: ${(props) => props.theme.color};
+    transition: all 0.3s linear;
   }
+`;
+
+// Styled-components
+const Container = styled.div`
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+`;
+
+const SearchBar = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid ${(props) => props.theme.highlight};
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const BlogCard = styled.div`
+  background: ${(props) => props.theme.cardBackground};
+  color: ${(props) => props.theme.color};
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 `;
 
 const Title = styled.h2`
-  text-align: center;
-  font-weight: normal;
-  color: #5e5a5a;
-  border-bottom: 2px solid #a8a8a8;
-  padding-bottom: 10px;
-`;
-
-const BlogItem = styled.div`
-  background-color: #fff;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-left: 5px solid #9e9a91;
-  border-radius: 5px;
-  border: 1px solid #dcdcdc;
-  transition: transform 0.3s ease-in-out;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-`;
-
-const BlogTitle = styled.h3`
-  font-size: 22px;
-  color: #4d4a4a;
-`;
-
-const BlogContent = styled.p`
-  font-size: 16px;
-  color: #606060;
-  text-indent: 2em;
-  line-height: 1.6;
-`;
-
-const ReadMoreButton = styled.button`
-  display: inline-block;
-  margin-top: 10px;
-  padding: 5px 15px;
-  background-color: #7a746e;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: 'Garamond', serif;
-  font-size: 16px;
-  transition: background-color 0.3s ease-in-out;
-
-  &:hover {
-    background-color: #605f5d;
-  }
+  color: ${(props) => props.theme.highlight};
 `;
 
 const Author = styled.small`
   display: block;
-  margin-top: 10px;
-  font-style: italic;
-  font-size: 14px;
+  margin-bottom: 15px;
+`;
+
+const Content = styled.p`
+  max-height: ${(props) => (props.isVisible ? '1000px' : '0')};
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out;
+`;
+
+const ToggleButton = styled.button`
+  background-color: ${(props) => props.theme.highlight};
+  color: ${(props) => props.theme.background};
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const ThemeSwitcher = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 24px;
+  color: ${(props) => props.theme.highlight};
 `;
 
 function BlogList() {
   const [blogs, setBlogs] = useState([]);
+  const [theme, setTheme] = useState('light');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     async function fetchBlogs() {
-      try {
-        const result = await axios('https://blogssss-k0gl.onrender.com/blogs');
-        setBlogs(result.data);
-      } catch (error) {
-        console.error("Error fetching blogs:", error);
-      }
+      const result = await axios('https://blogssss-k0gl.onrender.com/blogs');
+      setBlogs(result.data.map(blog => ({ ...blog, isVisible: false })));
     }
     fetchBlogs();
   }, []);
 
-  const [visibleBlogId, setVisibleBlogId] = useState(null);
-
-  const toggleContentVisibility = (id) => {
-    setVisibleBlogId(visibleBlogId === id ? null : id);
+  const toggleTheme = () => {
+    setTheme((current) => (current === 'light' ? 'dark' : 'light'));
   };
 
+  const handleSearch = debounce((e) => {
+    setSearchTerm(e.target.value.toLowerCase());
+  }, 300);
+
+  const toggleContentVisibility = (id) => {
+    setBlogs(blogs.map(blog => blog._id === id ? { ...blog, isVisible: !blog.isVisible } : blog));
+  };
+
+  const filteredBlogs = blogs.filter(
+    (blog) =>
+      blog.title.toLowerCase().includes(searchTerm) ||
+      blog.content.toLowerCase().includes(searchTerm)
+  );
+
   return (
-    <Container>
-      <Title> All Articles </Title>
-      {blogs.map((blog) => (
-        <BlogItem key={blog._id}>
-          <BlogTitle>{blog.title}</BlogTitle>
-          {visibleBlogId === blog._id && <BlogContent>{blog.content}</BlogContent>}
-          <ReadMoreButton onClick={() => toggleContentVisibility(blog._id)}>
-            {visibleBlogId === blog._id ? 'Less' : 'Read More'}
-          </ReadMoreButton>
-          <Author>Author: {blog.author}</Author>
-        </BlogItem>
-      ))}
-    </Container>
+    <ThemeProvider theme={themes[theme]}>
+      <GlobalStyles />
+      <Container>
+        <SearchBar
+          onChange={handleSearch}
+          placeholder="Search blogs..."
+        />
+        <ThemeSwitcher onClick={toggleTheme}>
+          {theme === 'light' ? '🌙' : '☀️'}
+        </ThemeSwitcher>
+        {filteredBlogs.map((blog) => (
+          <BlogCard key={blog._id}>
+            <Title>{blog.title}</Title>
+            <Author>Author: {blog.author}</Author>
+            {blog.isVisible && <Content>{blog.content}</Content>}
+            <ToggleButton onClick={() => toggleContentVisibility(blog._id)}>
+              {blog.isVisible ? 'Hide' : 'Read More'}
+            </ToggleButton>
+          </BlogCard>
+        ))}
+      </Container>
+    </ThemeProvider>
   );
 }
 
