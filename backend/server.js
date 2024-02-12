@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
   .catch((err) => console.log(err));
 
 // Routes
-const blogsRoutes = require('./routes/blogs'); // Adjust the path as necessary
+const blogsRoutes = require('./routes/Blog'); // Adjust the path as necessary
 app.use('/blogs', blogsRoutes);
 
 app.get('/', (req, res) => {
