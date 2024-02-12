@@ -15,7 +15,7 @@ const CreateBlog = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/blogs', blog);
+      await axios.post('https://blogssss-k0gl.onrender.com/blogs', blog);
       setBlog({ title: '', content: '', author: '' }); // Reset form after submission
     } catch (error) {
       console.error(error);

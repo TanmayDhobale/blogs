@@ -6,7 +6,7 @@ function BlogList() {
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      const result = await axios('http://localhost:5000/blogs');
+      const result = await axios('https://blogssss-k0gl.onrender.com/blogs');
       setBlogs(result.data);
     };
     fetchBlogs();
