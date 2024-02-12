@@ -2,19 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Blog = require('../models/Blog'); // Adjust the path as necessary
 
-router.get('/', async (req, res) => {
-    // Check if there's a special query parameter to return a simple message
-    if (req.query.msg === 'hey') {
-        return res.send('Hey from routes');
-    }
 
-    try {
-        const blogs = await Blog.find();
-        res.json(blogs);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
 
 // Get a single blog post
 router.get('/:id', getBlog, (req, res) => {
