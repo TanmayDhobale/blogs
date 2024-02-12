@@ -12,6 +12,14 @@ function BlogList() {
     fetchBlogs();
   }, []);
 
+  // State to track the visibility of blog content
+  const [visibleBlogId, setVisibleBlogId] = useState(null);
+
+  const toggleContentVisibility = (id) => {
+    // Toggle visibility: if the clicked blog is already visible, hide it, otherwise show it
+    setVisibleBlogId(visibleBlogId === id ? null : id);
+  };
+
   return (
     <div style={{
       fontFamily: "'Georgia', serif",
@@ -40,10 +48,28 @@ function BlogList() {
             fontSize: '24px',
             color: '#333333'
           }}>{blog.title}</h3>
-          <p style={{
-            fontSize: '16px',
-            color: '#666666'
-          }}>{blog.content}</p>
+          {/* Conditionally render the blog content if its ID matches the visibleBlogId */}
+          {visibleBlogId === blog._id && (
+            <p style={{
+              fontSize: '16px',
+              color: '#666666'
+            }}>{blog.content}</p>
+          )}
+          <button 
+            style={{
+              display: 'block',
+              margin: '10px 0',
+              padding: '5px 10px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+            onClick={() => toggleContentVisibility(blog._id)}
+          >
+            {visibleBlogId === blog._id ? 'Hide' : 'Read More'}
+          </button>
           <small style={{
             fontStyle: 'italic',
             fontSize: '14px'
