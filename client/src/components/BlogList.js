@@ -102,7 +102,7 @@ function BlogList() {
 
   return (
     <Container>
-      <Title>Academic Chronicles</Title>
+      <Title> All Articles </Title>
       {blogs.map((blog) => (
         <BlogItem key={blog._id}>
           <BlogTitle>{blog.title}</BlogTitle>
