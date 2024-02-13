@@ -24,6 +24,14 @@ const BlogList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [theme, setTheme] = useState('light'); // Options: 'light', 'dark', 'vintage'
 
+  useEffect(() => {
+    // Apply the theme to the entire page
+    document.body.style.backgroundColor = themes[theme].backgroundColor;
+    document.body.style.color = themes[theme].color;
+    // Additional styles to ensure consistency across the page
+    document.body.style.transition = 'background-color 0.5s ease, color 0.5s ease';
+  }, [theme]); // Reapply when theme changes
+
   const filteredBlogs = blogs.filter(blog =>
     blog.title.toLowerCase().includes(searchTerm.toLowerCase()) || blog.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -37,15 +45,6 @@ const BlogList = () => {
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : prevTheme === 'dark' ? 'vintage' : 'light');
   };
-
-  const getThemeStyle = () => ({
-    backgroundColor: themes[theme].backgroundColor,
-    color: themes[theme].color,
-    transition: 'background-color 0.5s ease, color 0.5s ease',
-    fontFamily: '"Times New Roman", Times, serif',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    border: theme === 'vintage' ? '2px solid #eee8d5' : 'none',
-  });
 
   const getButtonStyle = () => ({
     backgroundColor: themes[theme].buttonBackground,
@@ -69,7 +68,7 @@ const BlogList = () => {
   };
 
   return (
-    <div style={{ ...getThemeStyle(), padding: '20px', maxWidth: '800px', margin: '20px auto', borderRadius: '10px' }}>
+    <div style={{ padding: '20px', maxWidth: '800px', margin: '20px auto', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', border: theme === 'vintage' ? '2px solid #eee8d5' : 'none' }}>
       <h1 style={{ textAlign: 'center', fontFamily: '"Georgia", serif', transition: 'all 0.5s ease' }}>Blogs of Interest</h1>
       <div style={{ marginBottom: '20px' }}>
         <input
