@@ -70,6 +70,8 @@ const BlogList = () => {
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '20px auto', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', border: theme === 'vintage' ? '2px solid #eee8d5' : 'none' }}>
       <h1 style={{ textAlign: 'center', fontFamily: '"Georgia", serif', transition: 'all 0.5s ease' }}>Blogs of Interest</h1>
+         <p style={{ color: 'red', textAlign: 'center' }}>Note: 
+"Be respectful and kind; share your story thoughtfully, embracing diversity and constructive dialogue."</p>
       <div style={{ marginBottom: '20px' }}>
         <input
           type="text"
